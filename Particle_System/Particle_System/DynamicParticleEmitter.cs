@@ -11,11 +11,14 @@ namespace Particle_System
 {
     public class DynamicParticleEmitter : ParticleEmitter
     {
+        protected static Texture2D m_DefaultTexture = null;
         protected static TextureLoader m_TextureLoader;
 
         #region Properties
 
         // Misc
+        protected string m_TextureFilepath;
+
         public Texture2D ParticleTexture { get { return m_ParticleTexture; } set { m_ParticleTexture = value; } }
         public Vector2 Origin { get { return m_Origin; } set { m_Origin = value; } }
         public int EmitterDuration { get { return m_EmitterDuration; } set { m_EmitterDuration = value; } }
@@ -89,13 +92,17 @@ namespace Particle_System
         public void LoadContent(ContentManager content, string assetFilepath)
         {
             if (assetFilepath == "")
+            {
                 m_ParticleTexture = content.Load<Texture2D>("whiteCircle");
+                m_TextureFilepath = "default";
+            }
             else
             {
                 // Try loading with the content pipeline first
                 try
                 {
                     m_ParticleTexture = content.Load<Texture2D>(assetFilepath);
+                    m_TextureFilepath = assetFilepath;
                 }
                 catch (Exception ex)
                 {
@@ -104,14 +111,19 @@ namespace Particle_System
                     try
                     {
                         m_ParticleTexture = m_TextureLoader.FromFile(@assetFilepath);
+                        m_TextureFilepath = @assetFilepath;
                     }
                     catch (Exception e) // If once again it is unsuccessful at loading, it loads the default texture (white circle)
                     {
                         m_ParticleTexture = content.Load<Texture2D>("whiteCircle");
+                        m_TextureFilepath = "default";
                         Console.WriteLine("The texture you provided does not exist!");
                     }
                 }
             }
+
+            if (m_DefaultTexture == null)
+                m_DefaultTexture = m_ParticleTexture;
         }
 
         #endregion
@@ -170,7 +182,7 @@ namespace Particle_System
         public EmitterConfig GetConfig()
         {
             EmitterConfig config = new EmitterConfig();
-            config.m_TextureFilePath = ParticleTexture.Name;
+            config.m_TextureFilePath = m_TextureFilepath;
             config.m_Origin = m_Origin;
             config.m_EmitterDuration = m_EmitterDuration;
             config.m_IsInfinite = m_IsInfinite;
@@ -214,11 +226,20 @@ namespace Particle_System
         }
         public void SetConfig(EmitterConfig config)
         {
-            if (config.m_TextureFilePath == "default")
-                ParticleTexture = m_ContentManager.Load<Texture2D>("whiteCircle.png");
+            if (config.m_TextureFilePath == "default" || config.m_TextureFilePath == "")
+                //ParticleTexture = m_ContentManager.Load<Texture2D>("whiteCircle.png");
+                ParticleTexture = m_DefaultTexture;
             else
             {
-                ParticleTexture = m_TextureLoader.FromFile(config.m_TextureFilePath);
+                try
+                {
+                    ParticleTexture = m_TextureLoader.FromFile(config.m_TextureFilePath);
+                }
+                catch (System.Exception ex)
+                {
+                    ParticleTexture = m_DefaultTexture;
+                    Console.WriteLine("The texture you provided could not be found!");
+                }
             }
 
             Origin = config.m_Origin;
