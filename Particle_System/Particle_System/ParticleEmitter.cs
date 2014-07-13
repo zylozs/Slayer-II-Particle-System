@@ -23,6 +23,7 @@ namespace Particle_System
         protected ContentManager m_ContentManager;
         protected GraphicsDeviceManager m_Graphics;
         protected EmitterType m_Type;
+        protected Rectangle m_SourceRectangle;
 
         // Particle Colors
         protected fColor m_StartColor; // Typically from 0f to 255ff
@@ -146,6 +147,8 @@ namespace Particle_System
             m_BlendType = BlendState.AlphaBlend;
 
             LoadContent(m_ContentManager);
+
+            m_SourceRectangle = m_ParticleTexture.Bounds;
 
             // Color
             InitializeColorConfig();
@@ -285,7 +288,8 @@ namespace Particle_System
                                             (fb - sb) / pInfo.m_Lifespan, 
                                             (fa - sa) / pInfo.m_Lifespan);
 
-            part.CreateParticle(m_ParticleTexture, m_ParticleTexture.Bounds, pInfo, m_Type);
+            part.CreateParticle(m_ParticleTexture, m_SourceRectangle, pInfo, m_Type);
+
             m_Particles.Add(part);
         }
         #endregion

@@ -25,6 +25,7 @@ namespace Particle_System
         public bool IsInfinite { get { return m_IsInfinite; } set { m_IsInfinite = value; } }
         public bool IsOn { get { return m_IsOn; } set { m_IsOn = value; } }
         public EmitterType Type { get { return m_Type; } set { m_Type = value; } }
+        public Rectangle SourceRectangle { get { return m_SourceRectangle; } set { m_SourceRectangle = value; } }
 
         // Particle Colors
         public Color StartColor { get { return m_StartColor.toColor(); } set { m_StartColor.fromColor(value); } }
